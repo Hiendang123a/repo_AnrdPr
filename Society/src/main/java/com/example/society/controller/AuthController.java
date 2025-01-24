@@ -30,7 +30,6 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody User registerRequest) {
         try {
-            // Gọi phương thức login từ AuthService và trả về thông báo thành công
             String otp = authService.register(registerRequest);
             return ResponseEntity.ok(otp); // Trả về đối tượng User
         } catch (RuntimeException e) {
@@ -51,8 +50,9 @@ public class AuthController {
     }
 
     @PostMapping("/forgetPass")
-    public ResponseEntity<Object> register(@RequestBody String username) {
+    public ResponseEntity<Object> forgetPass(@RequestBody String username) {
         try {
+            username = username.replace("\"","").trim();
             // Gọi phương thức login từ AuthService và trả về thông báo thành công
             String otp = authService.forgetPassword(username);
             return ResponseEntity.ok(otp); // Trả về đối tượng User
@@ -63,9 +63,11 @@ public class AuthController {
     }
 
     @PutMapping("/verifyEmailRepass")
-    public ResponseEntity<Object> verifyEmailRepass(@RequestBody String otp, @RequestBody String newPass) {
+    public ResponseEntity<Object> verifyEmailRepass(@RequestBody String newPass, @RequestParam String otp)
+    {
         try {
-            authService.rePass(otp,newPass);
+            newPass = newPass.replace("\"","").trim();
+            authService.rePass(otp, newPass);
             return ResponseEntity.ok("Đổi mật khẩu thành công!");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -49,6 +49,7 @@ public class UserDAOImpl implements UserDAO {
         Session currentSession = entityManager.unwrap(Session.class);
         String hql = "SELECT COUNT(u) FROM User u WHERE u.username = :username";
         Long  count = (Long)currentSession.createQuery(hql).setParameter("username", username).uniqueResult();
+        System.out.println(count + " " + username);
         return count > 0;
     }
 
