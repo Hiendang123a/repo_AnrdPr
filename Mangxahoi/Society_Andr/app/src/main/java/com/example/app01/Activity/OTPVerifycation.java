@@ -3,6 +3,7 @@ package com.example.app01.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.Editable;
@@ -15,21 +16,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.app01.DTO.Request.VerifyOTPRequest;
+import com.example.app01.DTO.Response.APIResponse;
+import com.example.app01.Google.GoogleDriveHelper;
 import com.example.app01.R;
-import com.example.app01.api.AuthService;
-import com.example.app01.api.RetrofitClient;
-import com.example.app01.model.ErrorResponse;
+import com.example.app01.Api.AccountService;
+import com.example.app01.Api.RetrofitClient;
 import com.google.gson.Gson;
 
-import java.io.IOException;
-
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,15 +37,18 @@ import retrofit2.Retrofit;
 
 public class OTPVerifycation extends AppCompatActivity {
     private EditText otpET1, otpET2, otpET3, otpET4 , otpET5, otpET6;
+    private EditText[] otpETs;
+
     private Button verifyBtn;
     private TextView resendBtn,gmailTV;
     private boolean resendEnable = false;
-    private int resendTime = 300;
+    private final int resendTime = 300;
     private int selecttedETPosition = 0;
+    private boolean isDeleting = false; // Biến để theo dõi trạng thái xóa
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_otpverifycation);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -55,7 +58,7 @@ public class OTPVerifycation extends AppCompatActivity {
         String otp = getIntent().getStringExtra("otp");
         String username = getIntent().getStringExtra("username");
         String callType = getIntent().getStringExtra("CALL_TYPE");
-
+        String avatarUriString = getIntent().getStringExtra("avatarUri");
         gmailTV = findViewById(R.id.gmailTV);
         gmailTV.setText(username);
         otpET1 = findViewById(R.id.otpET1);
@@ -64,6 +67,8 @@ public class OTPVerifycation extends AppCompatActivity {
         otpET4 = findViewById(R.id.otpET4);
         otpET5 = findViewById(R.id.otpET5);
         otpET6 = findViewById(R.id.otpET6);
+        otpETs = new EditText[]{otpET1, otpET2, otpET3, otpET4, otpET5, otpET6};
+
         verifyBtn = findViewById(R.id.verifyBtn);
         resendBtn = findViewById(R.id.resendBtn);
 
@@ -89,7 +94,8 @@ public class OTPVerifycation extends AppCompatActivity {
                 if(generateOTP.equals(otp))
                 {
                     if ("fromRegister".equals(callType)) {
-                        createAccount(otp);
+                        VerifyOTPRequest verifyOTPRequest = new VerifyOTPRequest(generateOTP,username);
+                        createAccount(verifyOTPRequest,avatarUriString);
                     } else if ("fromForgetPass".equals(callType)) {
                         forgetPassword(otp,username);
                     }
@@ -105,45 +111,61 @@ public class OTPVerifycation extends AppCompatActivity {
             }
         });
     }
-    private void createAccount(String otp)
-    {
-        Retrofit retrofit = RetrofitClient.getRetrofitInstance();
-        AuthService authService = retrofit.create(AuthService.class);
-        Call<ResponseBody> call = authService.verifyEmail(otp); // Gọi API với kiểu String (OTP)
-        call.enqueue(new Callback<ResponseBody>() {
+    private void createAccount(VerifyOTPRequest verifyOTPRequest, String avatarUriString) {
+        GoogleDriveHelper googleDriveHelper = new GoogleDriveHelper(OTPVerifycation.this);
+
+        if (avatarUriString != null) {
+            Uri fileUri = Uri.parse(avatarUriString);
+            googleDriveHelper.uploadFileToSociety(fileUri, "image/jpg", () -> {
+                if (googleDriveHelper.getFileID() != null) {
+                    // Gán ID avatar sau khi upload thành công
+                    verifyOTPRequest.setIdAvatar(googleDriveHelper.getFileID());
+                    Log.d("ImageUpload", "File uploaded successfully, ID: " + googleDriveHelper.getFileID());
+
+                    // Gọi API sau khi đã có idAvatar
+                    callApiToCreateAccount(verifyOTPRequest, googleDriveHelper);
+                } else {
+                    Log.e("ImageUpload", "Upload failed, file ID is null.");
+                }
+            });
+        } else {
+            // Nếu không có avatar, gọi API luôn
+            callApiToCreateAccount(verifyOTPRequest, googleDriveHelper);
+        }
+    }
+    private void callApiToCreateAccount(VerifyOTPRequest verifyOTPRequest, GoogleDriveHelper googleDriveHelper) {
+        Retrofit retrofit = RetrofitClient.getRetrofitInstance(getApplicationContext());
+        AccountService accountService = retrofit.create(AccountService.class);
+        Call<APIResponse<Void>> call = accountService.verifyEmail(verifyOTPRequest);
+
+        call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<ResponseBody> otp, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
+            public void onResponse(@NonNull Call<APIResponse<Void>> otp,@NonNull Response<APIResponse<Void>> response) {
+                if (response.isSuccessful() && response.body() != null) {
                     startActivity(new Intent(OTPVerifycation.this, MainActivity.class));
                     Toast.makeText(OTPVerifycation.this, "Đăng ký tài khoản thành công!", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
-                        String errorBody = response.errorBody().string();
-
                         Gson gson = new Gson();
-                        ErrorResponse errorResponse = gson.fromJson(errorBody, ErrorResponse.class);
-                        Toast.makeText(OTPVerifycation.this, "Đăng Ký tài thất bại: " + errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.d("API Error", "Error: " + errorResponse.getMessage());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Toast.makeText(OTPVerifycation.this, "Lỗi đọc thông báo lỗi", Toast.LENGTH_SHORT).show();
-                        Log.e("API Error", "IOException: " + e.getMessage());
+                        APIResponse<?> errorResponse = gson.fromJson(response.errorBody().string(), APIResponse.class);
+                        Toast.makeText(OTPVerifycation.this, "Đăng ký tài khoản: " + errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Toast.makeText(OTPVerifycation.this, "Lỗi không xác định", Toast.LENGTH_SHORT).show();
+                    } finally {
+                        googleDriveHelper.deleteFileFromSociety(verifyOTPRequest.getIdAvatar());
                     }
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                // Xử lý lỗi nếu có
+            public void onFailure(@NonNull Call<APIResponse<Void>> call,@NonNull Throwable t) {
+                googleDriveHelper.deleteFileFromSociety(verifyOTPRequest.getIdAvatar());
                 Toast.makeText(OTPVerifycation.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("API Error", "Error message: " + t.getMessage(), t);
             }
         });
     }
-
     private void forgetPassword(String otp, String username)
     {
-
         Intent intent = new Intent(OTPVerifycation.this, ChangePassword.class);
         intent.putExtra("otp", otp);
         intent.putExtra("username", username);
@@ -177,13 +199,12 @@ public class OTPVerifycation extends AppCompatActivity {
     }
     private final TextWatcher textWatcher = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+        public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+            isDeleting = (count > 0);
         }
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
         }
 
         @Override
@@ -222,41 +243,23 @@ public class OTPVerifycation extends AppCompatActivity {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if(keyCode == event.KEYCODE_DEL){
-            switch (selecttedETPosition) {
-                case 5:
-                    selecttedETPosition = 4;
-                    showKeyboard(otpET5);
-
-                    break;
-                case 4:
-                    selecttedETPosition = 3;
-                    showKeyboard(otpET4);
-
-                    break;
-                case 3:
-                    selecttedETPosition = 2;
-                    showKeyboard(otpET3);
-
-                    break;
-                case 2:
-                    selecttedETPosition = 1;
-                    showKeyboard(otpET2);
-
-                    break;
-                case 1:
-                    selecttedETPosition = 0;
-                    showKeyboard(otpET1);
-                    break;
-                default:
-                    break;
+        if (keyCode == KeyEvent.KEYCODE_DEL) {
+            if (isDeleting) {
+                otpETs[selecttedETPosition].setText("");
+                isDeleting = false;
+                Log.d("Text", "Xoa o co text");
+            } else {
+                if (selecttedETPosition > 0) {
+                    selecttedETPosition--;
+                    otpETs[selecttedETPosition].setText("");
+                    Log.d("NoText", "Xoa o khong co text");
+                    showKeyboard(otpETs[selecttedETPosition]);
+                }
             }
+            isDeleting = false;
             return true;
-
-        }
-        else
-        {
-            return super.onKeyUp(keyCode,event);
+        } else {
+            return super.onKeyUp(keyCode, event);
         }
     }
 }

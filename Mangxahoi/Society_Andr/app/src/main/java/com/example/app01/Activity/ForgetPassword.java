@@ -7,20 +7,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
+import com.example.app01.DTO.Response.APIResponse;
+import com.example.app01.DTO.Response.OTPResponse;
 import com.example.app01.R;
-import com.example.app01.api.AuthService;
-import com.example.app01.api.RetrofitClient;
-import com.example.app01.model.ErrorResponse;
+import com.example.app01.Api.AccountService;
+import com.example.app01.Api.RetrofitClient;
+import com.example.app01.Validation.ValidationHelper;
 import com.google.gson.Gson;
-
-import java.io.IOException;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -32,7 +34,6 @@ public class ForgetPassword extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_forget_password);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -43,52 +44,53 @@ public class ForgetPassword extends AppCompatActivity {
         getOTPBtn = findViewById(R.id.getOTPBtn);
         getOTPBtn.setOnClickListener(v ->{
             String username = usernameET.getText().toString();
-            getOTP(username);
+            List<String> errors = new ArrayList<>();
+
+            if (ValidationHelper.isEmpty(username)) {
+                errors.add(ValidationHelper.EMPTY_USERNAME);
+            } else if (!ValidationHelper.isValidEmail(username)) {
+                errors.add(ValidationHelper.INVALID_EMAIL);
+            }
+
+            if (!errors.isEmpty()) {
+                Toast.makeText(ForgetPassword.this, String.join("\n", errors), Toast.LENGTH_LONG).show();
+            } else {
+                getOTP(username);
+            }
         });
     }
     private void getOTP(String username)
     {
-        Retrofit retrofit = RetrofitClient.getRetrofitInstance();
-        AuthService authService = retrofit.create(AuthService.class);
-        Call<String> call = authService.forgetPass(username); // Gọi API với kiểu String (OTP)
-        call.enqueue(new Callback<String>() {
+        Retrofit retrofit = RetrofitClient.getRetrofitInstance(getApplicationContext());
+        AccountService accountService = retrofit.create(AccountService.class);
+        Map<String, String> request = new HashMap<>();
+        request.put("username", username);
+        Call<APIResponse<OTPResponse>> call = accountService.forgetPass(request);
+        call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful()) {
-                    String otp = response.body();
-
-                    // Create an Intent to start the OTPVerifycation activity
+            public void onResponse(@NonNull Call<APIResponse<OTPResponse>> call,@NonNull Response<APIResponse<OTPResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    APIResponse<OTPResponse> apiResponse = response.body();
                     Intent intent = new Intent(ForgetPassword.this, OTPVerifycation.class);
 
-                    // Put the OTP as an extra in the Intent
-                    intent.putExtra("otp", otp);
-                    intent.putExtra("username",username);
+                    intent.putExtra("otp", apiResponse.getResult().getOtp());
+                    intent.putExtra("username",apiResponse.getResult().getUsername());
                     intent.putExtra("CALL_TYPE", "fromForgetPass");
-
-                    // Start the OTPVerifycation activity
+                    Log.d("API Response", "OTP: " + apiResponse.getResult().getOtp());
                     startActivity(intent);
-                    Log.d("API Response", "OTP: " + otp);  // OTP sẽ được hiển thị
                 } else {
                     try {
-                        String errorBody = response.errorBody().string();
-
                         Gson gson = new Gson();
-                        ErrorResponse errorResponse = gson.fromJson(errorBody, ErrorResponse.class);
-                        Toast.makeText(ForgetPassword.this, "Đăng Ký tài thất bại: " + errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.d("API Error", "Error: " + errorResponse.getMessage());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Toast.makeText(ForgetPassword.this, "Lỗi đọc thông báo lỗi", Toast.LENGTH_SHORT).show();
-                        Log.e("API Error", "IOException: " + e.getMessage());
+                        APIResponse<?> errorResponse = gson.fromJson(response.errorBody().string(), APIResponse.class);
+                        Toast.makeText(ForgetPassword.this, "Đăng nhập thất bại: " + errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Toast.makeText(ForgetPassword.this, "Lỗi không xác định", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
-
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                // Xử lý lỗi nếu có
+            public void onFailure(@NonNull Call<APIResponse<OTPResponse>> call,@NonNull Throwable t) {
                 Toast.makeText(ForgetPassword.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("API Error", "Error message: " + t.getMessage(), t);
             }
         });
     }

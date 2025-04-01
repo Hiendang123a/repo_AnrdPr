@@ -12,6 +12,8 @@ gsonConverter = "2.9.0"
 okhttpLoggingInterceptor = "4.9.0"
 gson = "2.8.8"
 threetenbp = "1.5.1"
+lombok = "1.18.36"
+circleimageview = "3.1.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -26,6 +28,9 @@ gsonConverter = { group = "com.squareup.retrofit2", name = "converter-gson", ver
 okhttpLoggingInterceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttpLoggingInterceptor" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 threetenbp = { group = "org.threeten", name = "threetenbp", version.ref = "threetenbp" }
+lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
+circleimageview = { group = "de.hdodenhof", name = "circleimageview", version.ref = "circleimageview" }
+
 
 
 [plugins]

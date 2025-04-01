@@ -1,82 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:id="@+id/main"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:gravity="center"
+tools:context=".Activity.RegisterActivity">
+
+    <RelativeLayout
+        android:layout_width="100dp"
+        android:layout_height="100dp">
+
+        <ImageView
+            android:id="@+id/avatarImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="@drawable/round_black_dark"
+            android:src="@drawable/default_avatar"
+            android:contentDescription="Avatar người dùng" />
+
+        <ImageView
+            android:id="@+id/uploadIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_uploadimg"
+            android:background="@drawable/round_back_primary"
+            android:padding="5dp"/>
+    </RelativeLayout>
+
+<com.google.android.material.textfield.TextInputLayout
+    android:id="@+id/etUsernameLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    tools:context=".Activity.Register">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Đăng Ký"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:layout_marginBottom="20dp"
-        />
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/etFullnameLayout"
+    android:layout_height="50dp"
+    android:layout_marginStart="15dp"
+    android:layout_marginEnd="15dp"
+    android:layout_marginTop="8dp"
+    android:background="@drawable/round_black_dark">
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/usernameET"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_black_dark"
+        android:hint="Tài khoản"
+        android:inputType="text"
+        android:textSize="14sp"
+        android:padding="12dp"/>
+</com.google.android.material.textfield.TextInputLayout>
+
+<com.google.android.material.textfield.TextInputLayout
+    android:id="@+id/etPasswordLayout"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    app:passwordToggleEnabled="true"
+    android:layout_marginStart="15dp"
+    android:layout_marginEnd="15dp"
+    android:layout_marginTop="15dp"
+    android:background="@drawable/round_black_dark">
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/passwordET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_black_dark"
+        android:hint="Mật khẩu"
+        android:inputType="textPassword"
+        android:textSize="14sp"
+        android:padding="12dp"/>
+</com.google.android.material.textfield.TextInputLayout>
+
+<com.google.android.material.textfield.TextInputLayout
+    android:id="@+id/etFullnameLayout"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:layout_marginStart="15dp"
+    android:layout_marginEnd="15dp"
+    android:layout_marginTop="15dp"
+    android:background="@drawable/round_black_dark">
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/fullnameET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_black_dark"
+        android:hint="Họ và tên"
+        android:inputType="text"
+        android:textSize="14sp"
+        android:padding="12dp"/>
+</com.google.android.material.textfield.TextInputLayout>
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:layout_marginStart="15dp"
+    android:layout_marginEnd="15dp"
+    android:layout_marginTop="15dp"
+    android:background="@drawable/round_black_dark">
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/etDateTVLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
         android:background="@drawable/round_black_dark">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/fullnameET"
+            android:id="@+id/dateET"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="none"
+            android:focusable="false"
             android:background="@drawable/round_black_dark"
-            android:hint="Họ và tên"
-            android:inputType="text"
-            android:textSize="14sp"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="25dp"
-        android:background="@drawable/round_black_dark"
-        >
-        <TextView
-            android:id="@+id/dateTV"
-            android:layout_width="200dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginTop="25dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_toStartOf="@+id/datePickerBtn"
-            android:textSize="14sp"
             android:hint="Ngày sinh"
-            />
-        <ImageView
-            android:id="@+id/datePickerBtn"
-            android:layout_width="50dp"
-            android:layout_height="match_parent"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginEnd="10dp"
-            android:adjustViewBounds="true"
-            android:src="@drawable/calendar"
-            />
-    </RelativeLayout>
-
+            android:textSize="14sp"
+            android:padding="12dp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    <ImageView
+        android:id="@+id/datePickerBtn"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="20dp"
+        android:src="@drawable/calendar" />
+</RelativeLayout>
+    <!-- Giới tính -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/round_black_dark"
         android:gravity="center_vertical">
         <TextView
@@ -85,91 +141,180 @@
             android:text="Giới tính"
             android:textSize="16sp"
             android:textColor="#000000"
-            android:layout_marginStart="10dp"
-            />
-
+            android:layout_marginStart="10dp" />
         <RadioGroup
             android:id="@+id/genderRadioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
             <RadioButton
                 android:id="@+id/maleRdb"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="30dp"
                 android:text="Nam"
-                android:textSize="16sp" />
-
+                android:textSize="14sp" />
             <RadioButton
                 android:id="@+id/femaleRdb"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="30dp"
                 android:text="Nữ"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
         </RadioGroup>
     </LinearLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-    android:id="@+id/etUsernameLayout"
-    android:layout_width="match_parent"
-    android:layout_height="55dp"
-    android:layout_marginStart="20dp"
-    android:layout_marginEnd="20dp"
-    android:layout_marginTop="10dp"
-    android:background="@drawable/round_black_dark">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/usernameET"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/round_black_dark"
-            android:hint="Tài khoản"
-            android:inputType="text"
-            android:textSize="14sp"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/etPasswordLayout"
+    <!-- Địa chỉ -->
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="55dp"
-        app:passwordToggleEnabled="true"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/round_black_dark">
+        android:layout_height="wrap_content"
+        android:text="Địa chỉ"
+        android:textSize="16sp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="10dp"/>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/passwordET"
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="5dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:background="@drawable/round_black_dark"
-            android:hint="Mật khẩu"
-            android:inputType="textPassword"
-            android:textSize="14sp"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/addressWardET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Phường/Xã"
+                android:inputType="text"
+                android:background="@drawable/round_black_dark"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/round_black_dark">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/addressDistrictET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Quận/Huyện"
+                android:inputType="text"
+                android:background="@drawable/round_black_dark" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/round_black_dark">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/addressProvinceET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Tỉnh/Thành phố"
+                android:inputType="text"
+                android:background="@drawable/round_black_dark" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <!-- Quê quán -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Quê quán"
+        android:textSize="16sp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="5dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="@drawable/round_black_dark"
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/hometownWardET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Phường/Xã"
+                android:inputType="text"
+                android:background="@drawable/round_black_dark"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/round_black_dark"
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/hometownDistrictET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Quận/Huyện"
+                android:inputType="text"
+                android:background="@drawable/round_black_dark"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/round_black_dark"
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/hometownProvinceET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Tỉnh/Thành phố"
+                android:inputType="text"
+                android:background="@drawable/round_black_dark"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/signUpBtn"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginStart="20dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/round_back_primary"
         android:text="Đăng Ký"
         android:textAllCaps="false"
-        android:layout_marginTop="40dp"
-        android:background="@drawable/round_back_primary"
-        android:textSize="20sp"
         android:textColor="@color/white"
-        />
+        android:textSize="18sp" />
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="15dp"
         >
         <TextView
             android:layout_width="wrap_content"
